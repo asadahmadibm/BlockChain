@@ -47,6 +47,18 @@ namespace BlockChain
             chain.Add(block);
         }
 
-
+        public bool IsValid()
+        {
+            for (int i = 1; i < chain.Count; i++)
+            {
+                Block currentBlock = chain[i];
+                Block previousBlock = chain[i-1];
+                if(currentBlock.Hash!=currentBlock.CalculateHash())
+                    return false;
+                if(currentBlock.PreviousHash!=previousBlock.Hash) 
+                    return false;
+            }
+            return true;
+        }
     }
 }
