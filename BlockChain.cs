@@ -11,16 +11,27 @@ namespace BlockChain
     {
         public IList<Block> chain { get; set; }
         public int difficalty { get; set; } = 3;
+        public int revard { get; set; }
 
-        public BlockChain() 
+        IList<Transaction> pendingtransactions=new List<Transaction>();
+
+        public void CreateTranscation(Transaction transaction)
         {
-            InitializeChain();
-            AddGenesisBlock();
+            pendingtransactions.Add(transaction);
         }
 
-        private void InitializeChain()
+        public void ProcessTransaction(string minerAddress)
+        {
+            Block block=new Block(DateTime.Now,GetLatestBlock().Hash, pendingtransactions);
+            AddBlock(block);
+            pendingtransactions=new List<Transaction>();
+            CreateTranscation(new Transaction(null, minerAddress, revard));
+        }
+
+        public void InitializeChain()
         {
             chain= new List<Block>();
+            AddGenesisBlock();
         }
         private void AddGenesisBlock()
         {
@@ -30,7 +41,9 @@ namespace BlockChain
 
         private Block CreateGenesisBlock()
         {
-            return new Block(DateTime.Now, null, "{}");
+            Block block= new Block(DateTime.Now, null, pendingtransactions);
+            block.Mine(difficalty);
+            return block;
         }
 
         public Block GetLatestBlock()

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace BlockChain
@@ -14,15 +15,15 @@ namespace BlockChain
         public DateTime TimeStamp { get; set; }
         public string   PreviousHash { get; set; }
         public string Hash { get; set; }
-        public string Data { get; set; }
+        public IList<Transaction> Transactions { get; set; }
         public int Nonce { get; set; } = 1;
 
-        public Block(DateTime timeStamp,string previousHash,string data) 
+        public Block(DateTime timeStamp,string previousHash, IList<Transaction> transactions) 
         {
             Index= 0;
             TimeStamp = timeStamp;
             PreviousHash= previousHash;
-            Data = data;
+            Transactions = transactions;
             Hash = CalculateHash();
 
         }
@@ -30,7 +31,7 @@ namespace BlockChain
         public string CalculateHash()
         {
             SHA256 sHA256 = SHA256.Create();
-            byte[] input = Encoding.ASCII.GetBytes($"{TimeStamp}-{PreviousHash}-{Data}-{Nonce}");
+            byte[] input = Encoding.ASCII.GetBytes($"{TimeStamp}-{PreviousHash}-{JsonSerializer.Serialize(Transactions)}-{Nonce}");
             var output=sHA256.ComputeHash(input);
             return Convert.ToBase64String( output );
         }
